@@ -1,0 +1,16 @@
+{
+  "name": "JavascriptPrograms",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "canvaskit-wasm": "^0.37.0",
+    "immer": "^9.0.15",
+    "rambda": "^7.4.0",
+    "skia-canvas": "^1.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  }
+}

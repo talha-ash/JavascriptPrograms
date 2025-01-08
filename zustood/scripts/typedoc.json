@@ -1,0 +1,15 @@
+{
+  "exclude": [
+    "**/*test*/**",
+    "**/*fixture*/**",
+    "**/*template*/**",
+    "**/*stories*/**",
+    "**/*.development.*"
+  ],
+  "includeVersion": true,
+  "name": "@udecode/zustood",
+  "entryPoints": ["../packages/zustood/src/index.ts"],
+  "out": "../typedoc",
+  "tsconfig": "../packages/zustood/tsconfig.json",
+  "readme": "./README.md"
+}
