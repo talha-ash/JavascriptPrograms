@@ -1,26 +1,22 @@
-function func(str, k) {
-  let wStart = 0;
-  let wEnd = 0;
-  let hash = {};
-  let max = 0;
-
-  for (let i = 0; i < str.length; i++) {
-    const ele = str[i];
-    hash[ele] = (hash[ele] || 0) + 1;
-    while (Object.keys(hash).length > k) {
-      const leftEle = str[wStart];
-      hash[leftEle] -= 1;
-      if (hash[leftEle] == 0) {
-        delete hash[leftEle];
-      }
-      wStart++;
+function func(arr) {
+  function recur(pos, list, ans) {
+    if (pos >= list.length) {
+      ans.push([...list]);
     }
-    max = Math.max(max, i - wStart + 1);
+    for (let i = pos; i < list.length; i++) {
+      swap(list, i, pos);
+      recur(pos + 1, list, ans);
+      swap(list, i, pos);
+    }
   }
-  return max;
+  const ans = [];
+  recur(0, arr, ans);
+  return ans;
 }
 
-const str = "araaci";
+function swap(list, sourceIndex, destIndex) {
+  [list[destIndex], list[sourceIndex]] = [list[sourceIndex], list[destIndex]];
+}
 
-const result = func(str, 2);
+const result = func([1, 3, 5]);
 console.log(result);
