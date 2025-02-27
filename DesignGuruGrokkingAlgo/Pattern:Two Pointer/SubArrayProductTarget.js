@@ -1,15 +1,15 @@
 function func(list, target) {
   let r = 1;
-  let lastSum = 0;
+  let lastProduct = 0;
   let result = [];
   for (let i = 0; i < list.length; i++) {
     const ele = list[i];
     result.push([ele]);
-    lastSum = ele;
+    lastProduct = ele;
     r = i + 1;
-    while (lastSum * list[r] < target && i < list.length - 1) {
+    while (lastProduct * list[r] < target && i < list.length - 1) {
       const s = list[r];
-      lastSum *= s;
+      lastProduct *= s;
       const lastSub = result[result.length - 1];
       lastSub.push(s);
       result.push(lastSub);
@@ -76,3 +76,37 @@ console.log(result);
 // We have O(n²) subarrays: [1], [1,2], [1,2,3], [1,2,3,4], [2], [2,3], [2,3,4], [3], [3,4], [4]
 // Each subarray can be up to length n (like [1,2,3,4])
 // Multiplying these: O(n²) * O(n) = O(n³)
+
+class Solution {
+  findSubarrays(nums, target) {
+    // Handle edge cases where k is 0 or 1 (no subarrays possible)
+    if (target <= 1) return 0;
+
+    let totalCount = 0;
+
+    // Variable to store the product of elements in the current subarray.
+    let product = 1;
+
+    // Left boundary of the current subarray.
+    let left = 0;
+
+    // Iterate over the array using 'right' as the right boundary of the current
+    // subarray.
+    for (let right = 0; right < nums.length; right++) {
+      // Update the product with the current element.
+      product *= nums[right];
+
+      // If the product is greater than or equal to the target, slide the left
+      // boundary to the right until product is less than target.
+      while (product >= target && left < nums.length) {
+        product /= nums[left++];
+      }
+
+      // Update the total count by adding the number of valid subarrays with the current window size
+      totalCount += right - left + 1; // right - left + 1 represents the current window size
+    }
+
+    // Return the result.
+    return totalCount;
+  }
+}

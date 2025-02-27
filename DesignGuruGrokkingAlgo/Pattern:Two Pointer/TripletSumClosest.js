@@ -28,7 +28,7 @@ function func(list, sourceTarget) {
           smallest = smallest;
         } else {
           resultSum = sum;
-          smallest = newDiff;
+          smallest = smallest;
         }
       } else if (newDiff < smallest) {
         resultSum = sum;
