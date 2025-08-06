@@ -58,3 +58,20 @@ console.log(result);
 // *There's one exception to this. If all the elements in your
 // array are the same, you will always hit the worst case
 // runtime without some additional logic
+
+function quickSort2(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+  const pivot = arr[arr.length - 1];
+  const leftArr = [];
+  const rightArr = [];
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] < pivot) {
+      leftArr.push(arr[i]);
+    } else {
+      rightArr.push(arr[i]);
+    }
+  }
+  return [...quickSort2(leftArr), pivot, ...quickSort2(rightArr)];
+}

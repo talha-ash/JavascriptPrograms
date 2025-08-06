@@ -1,21 +1,20 @@
-const permute = (nums) => {
-  const list = [];
-  backtrack(list, [], nums);
-  return list;
-};
+function func(str) {
+  let hash = {}
+  for (let index = 0; index < str.length; index++) {
+    const element = str[index].toLowerCase();
+    const code = element.charCodeAt(0)
+    if (code >= 97 && code <= 122) {
+      hash[element] = hash[element] ? hash[element] + 1 : 1
 
-const backtrack = (list, tempList, nums) => {
-  if (tempList.length === nums.length) {
-    list.push([...tempList]); // Create a copy to avoid modification issues
-  } else {
-    for (let i = 0; i < nums.length; i++) {
-      if (tempList.includes(nums[i])) continue; // Check if element already exists
-      tempList.push(nums[i]);
-      backtrack(list, tempList, nums);
-      tempList.pop();
+      if (hash[element] >= 2) {
+        return false
+      }
     }
-  }
-};
 
-const result = permute([1, 2, 3]);
-console.log(result);
+  }
+  return true
+}
+
+
+const result = func("TheQuickBrownFoxJumpsOverTheLazyDog")
+console.log(result)

@@ -1,6 +1,5 @@
 function func(str, k) {
   let wStart = 0;
-  let wEnd = 0;
   let hash = {};
   let max = 0;
 

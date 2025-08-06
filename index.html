@@ -1,13 +1,178 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Optimized Emoji Picker Demo</title>
+        <style>
+            :root {
+                --emoji-size: 40px;
+                --grid-gap: 8px;
+                --columns: 8;
+            }
 
-  <body>
-    <script src="./raw.js" type="module"></script>
-  </body>
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    Roboto,
+                    Oxygen,
+                    Ubuntu,
+                    Cantarell,
+                    "Open Sans",
+                    "Helvetica Neue",
+                    sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .emoji-picker {
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 10px;
+                overflow-y: auto;
+                max-height: 400px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .category {
+                margin-bottom: 20px;
+                /* The key optimization: content-visibility */
+                content-visibility: auto;
+                /* Prevent layout shifts with contain-intrinsic-size */
+                /* This will be dynamically set based on the number of emojis */
+            }
+
+            .category-title {
+                font-weight: bold;
+                margin-bottom: 10px;
+                position: sticky;
+                top: 0;
+                background-color: white;
+                padding: 5px 0;
+                z-index: 1;
+            }
+
+            .emojis-grid {
+                display: grid;
+                grid-template-columns: repeat(var(--columns), 1fr);
+                gap: var(--grid-gap);
+            }
+
+            .emoji-button {
+                width: var(--emoji-size);
+                height: var(--emoji-size);
+                border: 1px solid transparent;
+                border-radius: 4px;
+                background-color: transparent;
+                cursor: pointer;
+                position: relative;
+                padding: 0;
+            }
+
+            .emoji-button:hover {
+                border-color: #ddd;
+                background-color: #f5f5f5;
+            }
+
+            /* Using ::after pseudo-element for the emoji image */
+            .emoji-button::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+
+            /* Only load the background image when the category is visible */
+            .category.onscreen .emoji-button::after {
+                background-image: var(--emoji-url);
+            }
+
+            /* Controls */
+            .controls {
+                margin-bottom: 20px;
+            }
+
+            .controls button {
+                margin-right: 10px;
+                padding: 8px 12px;
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            .controls button:hover {
+                background-color: #45a049;
+            }
+
+            /* Performance indicators */
+            .performance {
+                margin-top: 20px;
+                padding: 10px;
+                background-color: #f0f0f0;
+                border-radius: 4px;
+            }
+
+            .performance-metric {
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Optimized Emoji Picker Demo</h1>
+
+        <div class="controls">
+            <button id="generate-emojis" data-value-size="100">
+                Generate 100 Emojis
+            </button>
+            <button id="generate-emojis" data-value-size="500">
+                Generate 500 Emojis
+            </button>
+            <button id="generate-emojis" data-value-size="1000">
+                Generate 1,000 Emojis
+            </button>
+            <button id="generate-emojis" data-value-size="5000">
+                Generate 5,000 Emojis
+            </button>
+            <button id="generate-emojis" data-value-size="10000">
+                Generate 10,000 Emojis
+            </button>
+            <h1>Hello Text</h1>
+            <h1 id="emojis-length-text"></h1>
+        </div>
+
+        <script>
+            const genBtns = document.querySelectorAll("#generate-emojis");
+            const emojisLengthText =
+                document.getElementById("emojis-length-text");
+
+            genBtns.forEach((genBtn) =>
+                genBtn.addEventListener("click", (event) => {
+                    const size = event.target.dataset.valueSize;
+                    for (let i = 0; i < size * 100000; i++) {}
+                    // emojisLengthText.innerHTML = size;
+                    // renderText(size);
+                }),
+            );
+
+            async function renderText(size) {
+                await delay(parseInt(size));
+                emojisLengthText.innerHTML = size;
+            }
+
+            async function delay(delay) {
+                return new Promise((resolve) => setTimeout(resolve, delay));
+            }
+        </script>
+    </body>
 </html>

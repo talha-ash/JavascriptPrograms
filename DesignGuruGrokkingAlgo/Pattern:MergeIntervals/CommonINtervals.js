@@ -10,10 +10,7 @@ function func(input, input2) {
         interval1[0] >= interval2[0] && interval1[0] <= interval2[1];
       let bOverlapA =
         interval2[0] >= interval1[0] && interval2[0] <= interval1[1];
-      // console.log("interval1", interval1);
-      // console.log("interval2", interval2);
-      // console.log("aOverlapB", aOverlapB);
-      // console.log("bOverlapA", bOverlapA);
+
       if (aOverlapB || bOverlapA) {
         let start = Math.max(interval1[0], interval2[0]);
         let end = Math.min(interval1[1], interval2[1]);

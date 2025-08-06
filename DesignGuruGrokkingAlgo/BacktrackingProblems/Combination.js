@@ -13,7 +13,6 @@ function backtrack(subsets, tempList, nums, start, k) {
   for (let i = start; i < nums.length; i++) {
     tempList.push(nums[i]);
     backtrack(subsets, tempList, nums, i + 1, k);
-
     tempList.pop(); // Remove the last element to backtrack
   }
 }

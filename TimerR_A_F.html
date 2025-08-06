@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Timer using requestAnimationFrame</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #f0f0f0;
+            }
+
+            .timer-container {
+                text-align: center;
+                background-color: white;
+                border-radius: 10px;
+                padding: 30px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .display {
+                font-size: 5rem;
+                font-weight: bold;
+                margin: 20px 0;
+                font-family: monospace;
+                color: #333;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 1rem;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            #start {
+                background-color: #4caf50;
+                color: white;
+            }
+
+            #stop {
+                background-color: #f44336;
+                color: white;
+            }
+
+            #reset {
+                background-color: #2196f3;
+                color: white;
+            }
+
+            button:hover {
+                opacity: 0.9;
+            }
+
+            button:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="timer-container">
+            <h1>Timer</h1>
+            <div class="display" id="timer">00:00:00.000</div>
+            <div class="controls">
+                <button id="start">Start</button>
+                <button id="stop" disabled>Stop</button>
+                <button id="reset">Reset</button>
+            </div>
+        </div>
+
+        <script>
+            // Timer variables
+            let startTime = 0;
+            let elapsedTime = 0;
+            let timerRunning = false;
+            let animationFrameId = null;
+            let lastFrameTime = 0;
+
+            // DOM elements
+            const timerDisplay = document.getElementById("timer");
+            const startButton = document.getElementById("start");
+            const stopButton = document.getElementById("stop");
+            const resetButton = document.getElementById("reset");
+
+            // Format time as HH:MM:SS.mmm
+            function formatTime(timeInMs) {
+                const date = new Date(timeInMs);
+                const hours = String(date.getUTCHours()).padStart(2, "0");
+                const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+                const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+                const milliseconds = String(date.getUTCMilliseconds()).padStart(
+                    3,
+                    "0",
+                );
+
+                return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+            }
+
+            // Update timer display using requestAnimationFrame
+            function updateTimer(timestamp) {
+                if (!lastFrameTime) lastFrameTime = timestamp;
+
+                if (timerRunning) {
+                    elapsedTime = timestamp - startTime;
+                    timerDisplay.textContent = formatTime(elapsedTime);
+                    animationFrameId = requestAnimationFrame(updateTimer);
+                }
+            }
+
+            // Start timer
+            function startTimer() {
+                if (!timerRunning) {
+                    timerRunning = true;
+                    startTime = performance.now() - elapsedTime;
+                    startButton.disabled = true;
+                    stopButton.disabled = false;
+
+                    animationFrameId = requestAnimationFrame(updateTimer);
+                }
+            }
+
+            // Stop timer
+            function stopTimer() {
+                if (timerRunning) {
+                    timerRunning = false;
+                    cancelAnimationFrame(animationFrameId);
+                    startButton.disabled = false;
+                    stopButton.disabled = true;
+                }
+            }
+
+            // Reset timer
+            function resetTimer() {
+                stopTimer();
+                elapsedTime = 0;
+                lastFrameTime = 0;
+                timerDisplay.textContent = formatTime(0);
+            }
+
+            // Event listeners
+            startButton.addEventListener("click", startTimer);
+            stopButton.addEventListener("click", stopTimer);
+            resetButton.addEventListener("click", resetTimer);
+        </script>
+    </body>
+</html>

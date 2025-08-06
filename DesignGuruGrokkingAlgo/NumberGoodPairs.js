@@ -14,9 +14,9 @@ function func(nums) {
   return result;
 }
 
-const nums = [1, 1, 1, 1];
+const nums = [1, 1, 1, 1, 1, 1];
 
-const result = func(nums);
+let result = func(nums);
 console.log(result);
 
 function numGoodPairs(nums) {
@@ -34,3 +34,8 @@ function numGoodPairs(nums) {
 // then find number of pair formula and sum all
 // like if we have 3 element we can make 3 pair
 // in our example we sum = 3(1)+ 2(3) = 4
+result = numGoodPairs(nums);
+console.log(result);
+
+// n(n-1)/2 formula to get how many pair can be formed
+// form n items of list

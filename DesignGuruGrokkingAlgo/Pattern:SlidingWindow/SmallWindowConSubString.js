@@ -2,7 +2,6 @@ function func(input, pattern) {
   let windowStart = 0,
     matched = 0,
     charFrequency = {};
-  let resultIndices = [];
   let minLength = Infinity;
   let startIndex = 0;
   for (let i = 0; i < pattern.length; i++) {

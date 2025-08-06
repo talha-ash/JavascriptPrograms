@@ -1,22 +1,17 @@
-function func(arr) {
-  function recur(pos, list, ans) {
-    if (pos >= list.length) {
-      ans.push([...list]);
-    }
+function subSet(input) {
+  const subsets = [[]];
+  function recur(list, pos) {
     for (let i = pos; i < list.length; i++) {
-      swap(list, i, pos);
-      recur(pos + 1, list, ans);
-      swap(list, i, pos);
+      const ele = list[i];
+
+      recur(list, pos + 1);
     }
   }
-  const ans = [];
-  recur(0, arr, ans);
-  return ans;
+
+  recur(input, 0, []);
+  return subsets;
 }
 
-function swap(list, sourceIndex, destIndex) {
-  [list[destIndex], list[sourceIndex]] = [list[sourceIndex], list[destIndex]];
-}
-
-const result = func([1, 3, 5]);
+const input = [1, 3, 3];
+const result = subSet(input);
 console.log(result);

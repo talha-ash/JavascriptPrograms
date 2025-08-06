@@ -1,5 +1,6 @@
 function func(str1, str2) {
   let sum1 = 0;
+  let sum2 = 0;
   if (str1.length != str2.length) {
     return false;
   }
@@ -16,7 +17,7 @@ const str2 = "car";
 const result = func(str, str2);
 console.log(result);
 
-//we camn also use hashmap technique
+//we can also use hashmap technique
 //We can use a hash map to store the frequency
 // of each character in both strings.
 

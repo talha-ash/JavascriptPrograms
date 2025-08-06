@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Optimized Emoji Picker Demo</title>
+        <style>
+            :root {
+                --emoji-size: 40px;
+                --grid-gap: 8px;
+                --columns: 8;
+            }
+
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    Roboto,
+                    Oxygen,
+                    Ubuntu,
+                    Cantarell,
+                    "Open Sans",
+                    "Helvetica Neue",
+                    sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .emoji-picker {
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 10px;
+                overflow-y: auto;
+                max-height: 400px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .category {
+                margin-bottom: 20px;
+                /* The key optimization: content-visibility */
+                content-visibility: auto;
+                /* Prevent layout shifts with contain-intrinsic-size */
+                /* This will be dynamically set based on the number of emojis */
+            }
+
+            .category-title {
+                font-weight: bold;
+                margin-bottom: 10px;
+                position: sticky;
+                top: 0;
+                background-color: white;
+                padding: 5px 0;
+                z-index: 1;
+            }
+
+            .emojis-grid {
+                display: grid;
+                grid-template-columns: repeat(var(--columns), 1fr);
+                gap: var(--grid-gap);
+            }
+
+            .emoji-button {
+                width: var(--emoji-size);
+                height: var(--emoji-size);
+                border: 1px solid transparent;
+                border-radius: 4px;
+                background-color: transparent;
+                cursor: pointer;
+                position: relative;
+                padding: 0;
+            }
+
+            .emoji-button:hover {
+                border-color: #ddd;
+                background-color: #f5f5f5;
+            }
+
+            /* Using ::after pseudo-element for the emoji image */
+            .emoji-button::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+
+            /* Only load the background image when the category is visible */
+            .category.onscreen .emoji-button::after {
+                background-image: var(--emoji-url);
+            }
+
+            /* Controls */
+            .controls {
+                margin-bottom: 20px;
+            }
+
+            .controls button {
+                margin-right: 10px;
+                padding: 8px 12px;
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            .controls button:hover {
+                background-color: #45a049;
+            }
+
+            /* Performance indicators */
+            .performance {
+                margin-top: 20px;
+                padding: 10px;
+                background-color: #f0f0f0;
+                border-radius: 4px;
+            }
+
+            .performance-metric {
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Optimized Emoji Picker Demo</h1>
+
+        <div class="controls">
+            <button id="generate-small">Generate 100 Emojis</button>
+            <button id="generate-medium">Generate 500 Emojis</button>
+            <button id="generate-large">Generate 2,000 Emojis</button>
+            <button id="generate-huge">Generate 10,000 Emojis</button>
+            <button id="toggle-optimization">Toggle Optimization</button>
+        </div>
+
+        <div class="emoji-picker" id="emoji-picker">
+            <!-- Categories will be generated here -->
+        </div>
+
+        <div class="performance">
+            <h3>Performance Metrics</h3>
+            <div class="performance-metric">
+                DOM Nodes: <span id="dom-count">0</span>
+            </div>
+            <div class="performance-metric">
+                Render Time: <span id="render-time">0</span> ms
+            </div>
+        </div>
+
+        <script>
+            // Configuration
+            const emojiCategories = [
+                { name: "People", count: 0 },
+                { name: "Nature", count: 0 },
+                { name: "Food", count: 0 },
+                { name: "Activities", count: 0 },
+                { name: "Travel", count: 0 },
+                { name: "Objects", count: 0 },
+                { name: "Symbols", count: 0 },
+                { name: "Flags", count: 0 },
+            ];
+
+            const emojiColors = [
+                "#ff9999",
+                "#ffcc99",
+                "#ffff99",
+                "#ccff99",
+                "#99ffff",
+                "#cc99ff",
+                "#ff99ff",
+                "#ff9999",
+            ];
+
+            let isOptimized = true;
+
+            // Get DOM elements
+            const emojiPicker = document.getElementById("emoji-picker");
+            const domCount = document.getElementById("dom-count");
+            const renderTime = document.getElementById("render-time");
+
+            // Initialize IntersectionObserver to detect visible categories
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("onscreen");
+                        } else {
+                            entry.target.classList.remove("onscreen");
+                        }
+                    });
+                },
+                {
+                    rootMargin: "100px 0px",
+                    threshold: 0.1,
+                },
+            );
+
+            // Generate emojis
+            function generateEmojis(totalCount) {
+                const startTime = performance.now();
+
+                // Clear existing emojis
+                emojiPicker.innerHTML = "";
+
+                // Distribute emojis across categories
+                const baseCount = Math.floor(
+                    totalCount / emojiCategories.length,
+                );
+                const remainder = totalCount % emojiCategories.length;
+
+                emojiCategories.forEach((category, index) => {
+                    // Distribute emojis evenly with remainder going to first categories
+                    category.count = baseCount + (index < remainder ? 1 : 0);
+                });
+
+                // Create category elements
+                emojiCategories.forEach((category, categoryIndex) => {
+                    const categoryDiv = document.createElement("div");
+                    categoryDiv.className = "category";
+                    categoryDiv.id = `category-${categoryIndex}`;
+
+                    const titleDiv = document.createElement("div");
+                    titleDiv.className = "category-title";
+                    titleDiv.textContent = `${category.name} (${category.count})`;
+                    categoryDiv.appendChild(titleDiv);
+
+                    const emojisGrid = document.createElement("div");
+                    emojisGrid.className = "emojis-grid";
+                    categoryDiv.appendChild(emojisGrid);
+
+                    // Calculate how many rows we'll need
+                    const columns = parseInt(
+                        getComputedStyle(
+                            document.documentElement,
+                        ).getPropertyValue("--columns"),
+                    );
+                    const rows = Math.ceil(category.count / columns);
+                    const emojiSize = parseInt(
+                        getComputedStyle(
+                            document.documentElement,
+                        ).getPropertyValue("--emoji-size"),
+                    );
+                    const gridGap = parseInt(
+                        getComputedStyle(
+                            document.documentElement,
+                        ).getPropertyValue("--grid-gap"),
+                    );
+
+                    // Set the contain-intrinsic-size dynamically
+                    const categoryHeight = rows * (emojiSize + gridGap) + 40; // Add extra for padding and title
+                    categoryDiv.style.containIntrinsicSize = `auto ${categoryHeight}px`;
+
+                    // Create emoji buttons
+                    for (let i = 0; i < category.count; i++) {
+                        const emojiButton = document.createElement("button");
+                        emojiButton.className = "emoji-button";
+                        emojiButton.setAttribute(
+                            "aria-label",
+                            `${category.name} emoji ${i + 1}`,
+                        );
+
+                        // Generate a placeholder emoji (using a colored square)
+                        const color = emojiColors[categoryIndex];
+                        const shade = Math.floor(Math.random() * 40) + 80; // 80-120% brightness
+                        const uniqueColor = adjustColorBrightness(
+                            color,
+                            shade / 100,
+                        );
+
+                        // Set the emoji URL as a CSS variable
+                        emojiButton.style.setProperty(
+                            "--emoji-url",
+                            `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><rect width="40" height="40" rx="8" fill="${uniqueColor.replace("#", "%23")}" /><text x="50%" y="50%" font-family="sans-serif" font-size="20" text-anchor="middle" dy=".3em">${i % 10}</text></svg>')`,
+                        );
+
+                        emojisGrid.appendChild(emojiButton);
+                    }
+
+                    emojiPicker.appendChild(categoryDiv);
+
+                    // Observe the category for intersection
+                    if (isOptimized) {
+                        observer.observe(categoryDiv);
+                    } else {
+                        categoryDiv.classList.add("onscreen");
+                        categoryDiv.style.contentVisibility = "visible";
+                    }
+                });
+
+                // Update performance metrics
+                const endTime = performance.now();
+                domCount.textContent =
+                    document.querySelectorAll(".emoji-button").length;
+                renderTime.textContent = Math.round(endTime - startTime);
+            }
+
+            // Utility function to adjust color brightness
+            function adjustColorBrightness(hex, factor) {
+                const r = parseInt(hex.slice(1, 3), 16);
+                const g = parseInt(hex.slice(3, 5), 16);
+                const b = parseInt(hex.slice(5, 7), 16);
+
+                const adjustedR = Math.min(255, Math.round(r * factor));
+                const adjustedG = Math.min(255, Math.round(g * factor));
+                const adjustedB = Math.min(255, Math.round(b * factor));
+
+                return `#${adjustedR.toString(16).padStart(2, "0")}${adjustedG.toString(16).padStart(2, "0")}${adjustedB.toString(16).padStart(2, "0")}`;
+            }
+
+            // Event listeners
+            document
+                .getElementById("generate-small")
+                .addEventListener("click", () => generateEmojis(100));
+            document
+                .getElementById("generate-medium")
+                .addEventListener("click", () => generateEmojis(500));
+            document
+                .getElementById("generate-large")
+                .addEventListener("click", () => generateEmojis(2000));
+            document
+                .getElementById("generate-huge")
+                .addEventListener("click", () => generateEmojis(10000));
+
+            document
+                .getElementById("toggle-optimization")
+                .addEventListener("click", () => {
+                    isOptimized = !isOptimized;
+
+                    const categories = document.querySelectorAll(".category");
+                    categories.forEach((category) => {
+                        if (isOptimized) {
+                            category.style.contentVisibility = "auto";
+                            observer.observe(category);
+                        } else {
+                            category.style.contentVisibility = "visible";
+                            category.classList.add("onscreen");
+                            observer.unobserve(category);
+                        }
+                    });
+
+                    document.getElementById("toggle-optimization").textContent =
+                        isOptimized
+                            ? "Disable Optimization"
+                            : "Enable Optimization";
+                });
+
+            // Initialize with a small set of emojis
+            generateEmojis(100);
+        </script>
+    </body>
+</html>

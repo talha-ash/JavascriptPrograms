@@ -13,7 +13,6 @@ function func(input) {
   }
   return "/" + stack.join("/");
 }
-
 const input = "/a//b////c/d//././/..";
 const result = func(input);
 console.log(result);
